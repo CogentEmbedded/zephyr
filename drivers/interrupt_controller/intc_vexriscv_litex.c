@@ -99,10 +99,12 @@ static void vexriscv_litex_irq_handler(const void *device)
 	}
 #endif
 
+#ifdef CONFIG_GPIO
 	if (irqs & (1 << GPIO_IRQ)) {
 		ite = &_sw_isr_table[GPIO_IRQ];
 		ite->isr(ite->arg);
 	}
+#endif
 }
 
 void arch_irq_enable(unsigned int irq)
