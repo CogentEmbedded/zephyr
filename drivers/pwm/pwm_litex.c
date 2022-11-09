@@ -22,13 +22,17 @@ struct pwm_litex_cfg {
 	uint32_t reg_en;
 	uint32_t reg_width;
 	uint32_t reg_period;
+	bool no_glitch;
 };
 
 int pwm_litex_init(const struct device *dev)
 {
 	const struct pwm_litex_cfg *cfg = dev->config;
 
-	litex_write8(REG_EN_ENABLE, cfg->reg_en);
+	if (!cfg->no_glitch) {
+		litex_write8(REG_EN_ENABLE, cfg->reg_en);
+	}
+
 	return 0;
 }
 
@@ -42,7 +46,9 @@ int pwm_litex_set_cycles(const struct device *dev, uint32_t channel,
 		return -EINVAL;
 	}
 
-	litex_write8(REG_EN_DISABLE, cfg->reg_en);
+	if (!cfg->no_glitch) {
+		litex_write8(REG_EN_DISABLE, cfg->reg_en);
+	}
 	litex_write32(pulse_cycles, cfg->reg_width);
 	litex_write32(period_cycles, cfg->reg_period);
 	litex_write8(REG_EN_ENABLE, cfg->reg_en);
@@ -73,6 +79,7 @@ static const struct pwm_driver_api pwm_litex_driver_api = {
 		.reg_en = DT_INST_REG_ADDR_BY_NAME(n, enable),		       \
 		.reg_width = DT_INST_REG_ADDR_BY_NAME(n, width),	       \
 		.reg_period = DT_INST_REG_ADDR_BY_NAME(n, period),	       \
+		.no_glitch = DT_INST_PROP(n, no_glitch),		       \
 	};								       \
 									       \
 	DEVICE_DT_INST_DEFINE(n,					       \

@@ -17,6 +17,11 @@ properties:
     "#pwm-cells":
       const: 2
 
+    # Do not disable PWM when adjusting period or duty cycle
+    "no-glitch":
+      type: boolean
+      required: false
+
 pwm-cells:
   - channel
   - period
